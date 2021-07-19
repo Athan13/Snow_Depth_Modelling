@@ -4,6 +4,7 @@ import datetime
 
 import matplotlib.pyplot as plt
 
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
@@ -29,8 +30,7 @@ def difference_values(values, max_d=4, time_diff=1):
 
 
 if __name__ == "__main__":
-    # path_name = input("Path name: ")
-    path_name = "/Users/athan/Documents/Wegaw/Aigen Lake Test Data/combined snow data.csv"
+    path_name = input("Path name: ")  # /Users/athan/Documents/Wegaw/Aigen Lake Test Data/combined snow data.csv
     df = pd.read_csv(path_name)
     data_type = df.columns[1]
     df = df[["datetime", data_type]]
@@ -45,17 +45,18 @@ if __name__ == "__main__":
     test_data = list(df[df["datetime"] >= datetime.datetime(2021, 1, 1, 0, 0, 0)][data_type])
 
     # Plot ACF and PACF to get p and q respectively
-    fig, ax = plt.subplots(2, len(diffed_values))
-    for i in range(len(diffed_values)):
-        plot_acf(x=np.asarray(diffed_values[i]), lags=np.arange(8760), ax=ax[0, i], title=f"p = {i + 1}")
-        print(f"ACF[{i}] is done")
-        plot_pacf(x=np.asarray(diffed_values[i]), lags=np.arange(8760), ax=ax[1, i], title=f"q = {i + 1}")
-        print(f"PACF[{i}] is done \n")
+    # fig, ax = plt.subplots(2, len(diffed_values))
+    # for i in range(len(diffed_values)):
+    #     plot_acf(x=np.asarray(diffed_values[i]), lags=np.arange(8760), ax=ax[0, i], title=f"p = {i + 1}")
+    #     print(f"ACF[{i}] is done")
+    #     plot_pacf(x=np.asarray(diffed_values[i]), lags=np.arange(8760), ax=ax[1, i], title=f"q = {i + 1}")
+    #     print(f"PACF[{i}] is done \n")
+    #
+    # plt.show()
 
-    plt.show()
-
-    # ARIMA model
-    model = ARIMA(train_data, order=(2, 1, 2))
+    # (s)ARIMA model
+    # model = ARIMA(train_data, order=(2, 1, 2))
+    model = SARIMAX(train_data, order=(2, 1, 2), seasonal_order=(1, 0, 1, 8760))
     model_fit = model.fit()
     output = model_fit.forecast(len(test_data))
 
