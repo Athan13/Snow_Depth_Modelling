@@ -30,20 +30,22 @@ def daterange(start_date, iterations):
 def sum_seasonal_data(train_data, forecast, period=365):
     min_test_date = datetime.datetime(2021, 1, 1, 0, 0, 0)
     forecast = pd.DataFrame(forecast, columns=train_data.columns, index=daterange(min_test_date, len(forecast)))
-    print(forecast)
     for index, row in forecast.iterrows():
         for column_name, value in row.items():
-            try:
-                prev_value = train_data.at[index - datetime.timedelta(days=period), column_name]
-            except KeyError:
-                prev_value = train_data.at[index - datetime.timedelta(days=period+1), column_name]
+            i = 0
+            while True:
+                try:
+                    prev_value = train_data.at[index - datetime.timedelta(days=period-i), column_name]
+                    break
+                except KeyError:
+                    i += 1
+
             forecast.at[index, column_name] += prev_value
     return forecast
 
 
 if __name__ == "__main__":
-    path_name = "/Users/athan/Documents/Wegaw/Aigen Lake Test Data/combined snow data.csv"
-    # path_name = input("Path name: ")
+    path_name = input("Path name: ")
     df = pd.read_csv(path_name)
     df.index = pd.to_datetime(df["datetime"])
     df = df.drop(columns="datetime")
@@ -65,7 +67,7 @@ if __name__ == "__main__":
 
     plt.plot(snow_forecast, color="blue")
     plt.plot(snow_true, color="green")
-    plt.legend(["forecast", "true"])
+    plt.legend(["forecast (VAR)", "true"])
     plt.ylabel(forecast.columns[0])
     plt.text(datetime.date(2021, 6, 1), 95, s=f"RMSE = {rmse}")
     plt.show()
