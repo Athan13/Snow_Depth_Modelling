@@ -75,7 +75,7 @@ def final_outlier_cleanup(int_series, sensitivity):
     return new_int_series
 
 
-def read_and_clean_data(path_name, data_type, outlier_sensitivity=4):
+def read_and_clean_data(path_name, data_type, outlier_sensitivity=3):
     data = pd.read_csv(path_name).drop(range(5))
     data.columns = ["datetime", data_type]
 
@@ -93,14 +93,9 @@ def read_and_clean_data(path_name, data_type, outlier_sensitivity=4):
 
     return data
 
-# /Users/athan/Documents/Wegaw/Aigen Lake Test Data/Snow-Depth-(cm).csv
-# /Users/athan/Documents/Wegaw/Aigen Lake Test Data/Temperature (K).csv
-# /Users/athan/Documents/Wegaw/Aigen Lake Test Data/sw (mm).csv
-
 
 if __name__ == "__main__":
-    # snow_path_name = str(input("Path name for snow data: "))
-    snow_path_name = "/Users/athan/Documents/Wegaw/Aigen Lake Test Data/Snow-Depth-(cm).csv"
+    snow_path_name = str(input("Path name for snow data: "))
     snow_data = read_and_clean_data(snow_path_name, "snow depth (cm)")
 
     no_data_sets = int(input("How many more data sets? "))
@@ -113,7 +108,7 @@ if __name__ == "__main__":
 
     print(snow_data)
     if input("Download data? [y/n]: ") == "y":
-        snow_data.to_csv("/Users/athan/Documents/Wegaw/Aigen Lake Test Data/combined_data.csv", index=False)
+        snow_data.to_csv(f"{snow_path_name[:-4]}-cleaned.csv", index=False)
 
     # Plot
     for i in range(1, len(snow_data.columns)):
